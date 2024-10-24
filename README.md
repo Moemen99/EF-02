@@ -377,3 +377,149 @@ public class CompanyDbContext : DbContext
     }
 }
 ```
+
+
+
+
+
+# Entity Framework Core - DbSet Configuration
+
+## DbSet Overview
+
+```csharp
+public class CompanyDbContext : DbContext
+{
+    public DbSet<Employee> Employees { get; set; }
+}
+```
+
+### What is DbSet?
+- Represents a database table, view, or function
+- Collection of entities in the context
+- Provides specialized database operations
+- Maps C# entities to database objects
+
+```mermaid
+graph TD
+    A[DbContext] --> B[DbSet<Employee>]
+    B --> C[Database Table]
+    B --> D[Database View]
+    B --> E[Database Function]
+    style B fill:#f9f,stroke:#333,stroke-width:4px
+```
+
+## Comparison with Regular Collections
+
+| Feature | DbSet | List/HashSet |
+|---------|-------|--------------|
+| Table Operations | ✅ Yes | ❌ No |
+| LINQ to Entities | ✅ Yes | ❌ No |
+| Remote Queries | ✅ Yes | ❌ No |
+| Database Tracking | ✅ Yes | ❌ No |
+| Memory Collection | ❌ No | ✅ Yes |
+
+## Common DbSet Operations
+
+```csharp
+// In Program.cs
+using var dbContext = new CompanyDbContext();
+
+// Add new employee
+dbContext.Employees.Add(new Employee());
+
+// Query employees
+var employee = dbContext.Employees.Where(e => e.Id == 1);
+
+// Update employee
+dbContext.Employees.Update(employee);
+
+// Remove employee
+dbContext.Employees.Remove(employee);
+```
+
+## LINQ to Entities
+- Queries against remote sequences
+- Database-agnostic operations
+- Translated to native SQL
+- Works with any supported provider:
+  - SQL Server
+  - MySQL
+  - PostgreSQL
+  - Others
+
+```mermaid
+graph LR
+    A[LINQ Query] --> B[EF Core]
+    B --> C[SQL Server]
+    B --> D[MySQL]
+    B --> E[PostgreSQL]
+    style B fill:#f9f,stroke:#333,stroke-width:4px
+```
+
+## Key Features
+
+### 1. Entity Tracking
+- Tracks changes to entities
+- Manages entity state
+- Handles relationship fixes
+
+### 2. Query Capabilities
+- Complex LINQ queries
+- Filtered queries
+- Aggregations
+- Joins and includes
+
+### 3. Database Operations
+- Add/Update/Delete operations
+- Bulk operations
+- Transaction support
+- Concurrency handling
+
+## Best Practices
+
+1. **Naming Conventions**
+   - Use plural names for DbSet properties
+   - Match database table names
+   - Be consistent across context
+
+2. **Usage Guidelines**
+   - Use DbSet for database operations
+   - Avoid manual collection operations
+   - Leverage LINQ for queries
+
+3. **Performance Considerations**
+   - Use appropriate LINQ methods
+   - Consider query execution timing
+   - Be aware of tracking behavior
+
+## Common Patterns
+
+### Basic CRUD Operations
+```csharp
+// Create
+dbContext.Employees.Add(new Employee { Name = "John" });
+
+// Read
+var employee = dbContext.Employees.FirstOrDefault(e => e.Id == 1);
+
+// Update
+dbContext.Employees.Update(employee);
+
+// Delete
+dbContext.Employees.Remove(employee);
+```
+
+### LINQ Queries
+```csharp
+// Filtered query
+var employees = dbContext.Employees
+    .Where(e => e.Salary > 50000);
+
+// Ordering
+var sortedEmployees = dbContext.Employees
+    .OrderBy(e => e.Name);
+
+// Aggregation
+var averageSalary = dbContext.Employees
+    .Average(e => e.Salary);
+```
