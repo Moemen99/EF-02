@@ -310,9 +310,17 @@ public class CompanyDbContext : DbContext
 ```mermaid
 graph TD
     A[Program: new CompanyDbContext()] --> B[CompanyDbContext Constructor]
-    B -->|base()| C[DbContext Constructor]
-    C -->|Dynamic Binding| D[OnConfiguring]
+    B --> C[DbContext Constructor]
+    C --> D[OnConfiguring]
     D --> E[Database Connection Established]
+```
+
+```mermaid
+graph TD
+    A["Program: new CompanyDbContext()"] --> B["CompanyDbContext Constructor"]
+    B -->|"base()"| C["DbContext Constructor"]
+    C -->|"Dynamic Binding"| D["OnConfiguring"]
+    D --> E["Database Connection Established"]
     style D fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
