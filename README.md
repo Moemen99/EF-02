@@ -307,13 +307,6 @@ public class CompanyDbContext : DbContext
    - Sets connection string
    - Establishes connection parameters
 
-```mermaid
-graph TD
-    A[Program: new CompanyDbContext()] --> B[CompanyDbContext Constructor]
-    B --> C[DbContext Constructor]
-    C --> D[OnConfiguring]
-    D --> E[Database Connection Established]
-```
 
 ```mermaid
 graph TD
