@@ -248,3 +248,131 @@ optionsBuilder.UseSqlServer(
 - Ensure database exists
 - Verify network connectivity
 - Check firewall settings
+
+
+
+# Entity Framework Core - DbContext Initialization Flow
+
+## Object Creation Process
+
+```mermaid
+sequenceDiagram
+    participant P as Program
+    participant CDC as CompanyDbContext Constructor
+    participant DBC as DbContext Constructor
+    participant OC as OnConfiguring
+    
+    P->>CDC: new CompanyDbContext()
+    CDC->>DBC: base()
+    DBC->>OC: Call OnConfiguring
+    OC-->>DBC: Return Configuration
+    DBC-->>CDC: Complete Initialization
+    CDC-->>P: Return DbContext Instance
+```
+
+## Constructor Chain
+
+### 1. Initial Object Creation
+```csharp
+// In Program.cs
+CompanyDbContext dbContext = new CompanyDbContext();
+```
+
+### 2. Implicit Constructor Definition
+```csharp
+public class CompanyDbContext : DbContext
+{
+    // Automatically generated - no need to write explicitly
+    public CompanyDbContext() : base() { }
+}
+```
+
+## Initialization Flow
+
+1. **Program Creates Object**
+   - Calls parameterless constructor
+   - Triggers constructor chain
+
+2. **CompanyDbContext Constructor**
+   - Implicit or explicit constructor
+   - Chains to base class (DbContext)
+
+3. **DbContext Constructor**
+   - Takes DbContextOptions
+   - Triggers OnConfiguring
+   - Sets up database connection
+
+4. **OnConfiguring Method**
+   - Configures database provider
+   - Sets connection string
+   - Establishes connection parameters
+
+```mermaid
+graph TD
+    A[Program: new CompanyDbContext()] --> B[CompanyDbContext Constructor]
+    B -->|base()| C[DbContext Constructor]
+    C -->|Dynamic Binding| D[OnConfiguring]
+    D --> E[Database Connection Established]
+    style D fill:#f9f,stroke:#333,stroke-width:4px
+```
+
+## Key Points
+
+### Constructor Behavior
+- Parameterless constructor is automatically generated
+- No need for explicit constructor definition
+- Base constructor chaining happens automatically
+
+### Dynamic Binding
+- OnConfiguring is called through dynamic binding
+- Allows for runtime configuration
+- Supports different environments
+
+### Connection Lifecycle
+1. Object instantiation begins
+2. Constructor chain executes
+3. Configuration is applied
+4. Connection is established
+5. DbContext is ready for use
+
+## Best Practices
+
+1. **Constructor Usage**
+   - Let EF Core handle constructor generation
+   - Only create custom constructors when needed
+   - Maintain the base constructor chain
+
+2. **Configuration Timing**
+   - OnConfiguring is the right place for connection setup
+   - Avoid configuration in constructors
+   - Consider using dependency injection in ASP.NET Core
+
+3. **Error Handling**
+   - Connection errors are thrown during initialization
+   - Handle exceptions appropriately
+   - Log connection issues for debugging
+
+## Common Scenarios
+
+### Basic Usage
+```csharp
+// Simple instantiation
+using var context = new CompanyDbContext();
+```
+
+### With Dependency Injection (ASP.NET Core)
+```csharp
+services.AddDbContext<CompanyDbContext>();
+```
+
+### Custom Constructor (When Needed)
+```csharp
+public class CompanyDbContext : DbContext
+{
+    // Custom configuration
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options)
+        : base(options)
+    {
+    }
+}
+```
