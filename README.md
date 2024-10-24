@@ -115,3 +115,136 @@ public class ApplicationDbContext : DbContext
    - Plan for future changes
    - Consider column size constraints
    - Think about indexing requirements
+
+
+
+# Entity Framework Core - DbContext Setup and Configuration
+
+## Project Structure
+```
+ProjectName/
+├── Context/
+│   └── CompanyDbContext.cs
+├── Domain/
+│   └── Entities/
+```
+
+## Package Installation
+
+### Installing Required Packages
+```powershell
+# Latest version (not recommended for specific projects)
+Install-Package Microsoft.EntityFrameworkCore.SqlServer
+
+# Specific version (recommended)
+Install-Package Microsoft.EntityFrameworkCore.SqlServer -v 6.0.15
+```
+
+### Database Provider Packages
+| Database | Package Name |
+|----------|--------------|
+| SQL Server | Microsoft.EntityFrameworkCore.SqlServer |
+| MySQL | Microsoft.EntityFrameworkCore.MySQL |
+| Oracle | Microsoft.EntityFrameworkCore.Oracle |
+
+## DbContext Implementation
+
+```csharp
+using Microsoft.EntityFrameworkCore;
+
+namespace YourNamespace.Context
+{
+    public class CompanyDbContext : DbContext
+    {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(
+                "Server=.;Database=CompanyDB;Trusted_Connection=True;"
+            );
+        }
+    }
+}
+```
+
+## Connection String Components
+
+### Modern Keys (Entity Framework Core)
+```mermaid
+graph TD
+    A[Connection String] --> B[Server]
+    A --> C[Database]
+    A --> D[Authentication]
+    D --> E[Trusted_Connection]
+    D --> F[User/Password]
+```
+
+| Component | Key | Description | Example |
+|-----------|-----|-------------|---------|
+| Server | `Server` | SQL Server instance | `Server=.` or `Server=SERVERNAME` |
+| Database | `Database` | Database name | `Database=CompanyDB` |
+| Windows Auth | `Trusted_Connection` | Windows authentication | `Trusted_Connection=True` |
+| SQL Auth | `User Id`, `Password` | SQL Server authentication | `User Id=sa;Password=pass` |
+
+### Legacy Keys (Traditional ADO.NET)
+| Modern Key | Legacy Key |
+|------------|------------|
+| `Server` | `Data Source` |
+| `Database` | `Initial Catalog` |
+| `Trusted_Connection` | `Integrated Security` |
+
+## Authentication Methods
+
+### 1. Windows Authentication
+```csharp
+// Using Windows Authentication
+optionsBuilder.UseSqlServer(
+    "Server=.;Database=CompanyDB;Trusted_Connection=True;"
+);
+```
+
+### 2. SQL Server Authentication
+```csharp
+// Using SQL Server Authentication
+optionsBuilder.UseSqlServer(
+    "Server=.;Database=CompanyDB;User Id=sa;Password=yourpassword;"
+);
+```
+
+## Best Practices
+
+### Connection String Management
+1. **Don't hardcode** connection strings in DbContext
+2. Use configuration files or environment variables
+3. Consider using secrets management in development
+
+### Server Specification
+- Use `.` or `(localdb)\MSSQLLocalDB` for local development
+- Use full server name for specific instances
+- Consider using aliases for production environments
+
+### Security
+- Prefer Windows Authentication in corporate environments
+- Use strong passwords for SQL Authentication
+- Never commit connection strings to source control
+- Use secure connection strings in production
+
+### Code Organization
+- Keep DbContext in dedicated folder
+- Follow naming convention: `[Name]DbContext`
+- Group related configurations together
+- Consider using separate configuration classes for complex models
+
+## Common Setup Steps
+1. Create Context folder
+2. Create DbContext class
+3. Install required provider package
+4. Inherit from DbContext
+5. Override OnConfiguring
+6. Configure connection string
+
+## Troubleshooting
+- Verify SQL Server instance name
+- Check authentication credentials
+- Ensure database exists
+- Verify network connectivity
+- Check firewall settings
